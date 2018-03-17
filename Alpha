@@ -1,0 +1,68 @@
+.data  
+Alphabet: .asciiz "Alpha ","Bravo ","China ","Delta ","Echo ","Foxtrot ","Golf ","Hotel ","India ","Juliet ","Kilo ","Lima ","Mary ","November ","Oscar ","Paper ","Quebec ","Research ","Sierra ","Tango ","Uniform ","Victor ","Whisky ","X-ray ","Yankee ","Zulu " 
+offset: .word 0,7,14,21,28,34,43,49,56,63,71,77,83,89,99,106,113,121,131,139,146,155,163,171,178,186,192
+number: .asciiz "zero " , "First " , "Second " , "Third " , "Fourth " , "Fifth " , "Sixth " , "Seventh " , "Eighth " , "Ninth "
+num_offset: .word  0,6,13,21,28,36,43,50,59,67
+alphabet: .asciiz "alpha ","bravo ","china ","delta ","echo ","foxtrot ","golf ","hotel ","india ","juliet ","kilo ","lima ","mary ","november ","oscar ","paper ","quebec ","research ","sierra ","tango ","uniform ","victor ","whisky ","x-ray ","yankee ","zulu " 
+  .text
+  .globl main
+main:
+li $v0 , 12
+syscall
+sub $s0 , $v0 , 63
+beqz $s0 , exit
+
+sub $s0 , $v0 , 48  
+bltz $s0 , default
+sub $s1 , $v0 , 59 # if it's a number
+bltz $s1 , num
+
+sub $s0 , $v0 , 65
+bltz $s0 , default
+sub $s1 , $v0 , 91 # if it's capital
+bltz $s1 , capital
+
+sub $s0 , $v0 , 97
+bltz $s0 , default
+sub $s1 , $v0 , 123 #if it's lowercase
+bltz $s1 , lowercase
+default:
+li $a0 , 42
+li $v0 , 11
+syscall
+j main
+num:
+sub $s0 , $v0 , 48 
+la $s3 , num_offset
+sll $s0 , $s0 , 2
+add $s3 , $s3 , $s0
+lw $s1 , ($s3)
+la $a0 , number
+add $a0 , $a0 , $s1
+li $v0 , 4
+syscall
+j main
+capital:
+sub $s0 , $v0 , 65 
+la $s3 , offset
+sll $s0 , $s0 , 2
+add $s3 , $s3 , $s0
+lw $s1 , ($s3)
+la $a0 , Alphabet
+add $a0 , $a0 , $s1
+li $v0 , 4
+syscall
+j main
+lowercase:
+sub $s0 , $v0 , 97 
+la $s3 , offset
+sll $s0 , $s0 , 2
+add $s3 , $s3 , $s0
+lw $s1 , ($s3)
+la $a0 , alphabet
+add $a0 , $a0 , $s1
+li $v0 , 4
+syscall
+j main
+exit:
+
