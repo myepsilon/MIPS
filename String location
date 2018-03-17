@@ -1,0 +1,55 @@
+.data 
+sentence: .asciiz "Fail! " , "Success! Location: "
+buf: .space 200
+.text
+.globl main
+main:
+	li $v0 , 8
+	la $a0 , buf
+	li $a1 , 200
+	syscall
+	move $s0 , $a0
+	move $s5 , $s0
+	move $s1 , $a1
+search:
+	li $v0 , 12
+	syscall
+	move $s6 , $v0
+	sub $a0 , $v0 , 63
+	beqz $a0 , exit
+	li $a0 , 10
+	li $v0 , 11
+	syscall
+	and $s2 , $0 , $0
+	move $s0 , $s5
+findchar:
+	lb $s3 , ($s0)
+	beq $s6 , $s3 , success
+	addi $s2 , $s2 , 1
+	addi $s0 , $s0 , 1
+	bge $s2 , $s1 , fail
+	j findchar
+fail:
+	la $s4 , sentence
+	li $v0 , 4
+	move $a0 , $s4
+	syscall
+	li $a0 , 10
+	li $v0 , 11
+	syscall
+	j search
+success:
+	la $s4 , sentence
+	addi $s4 , $s4 , 7
+	li $v0 , 4
+	move $a0 , $s4
+	syscall
+	addi $a0 , $s2 , 1
+	li $v0 , 1
+	syscall
+	li $a0 , 10
+	li $v0 , 11
+	syscall
+	j search
+exit:
+	
